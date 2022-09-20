@@ -1,2 +1,2 @@
-# taxmoja-app
-This connects different ERP's to taxmoja
+# django-taxmoja
+Integration of different software like xero in taxmoja
