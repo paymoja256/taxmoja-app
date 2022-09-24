@@ -21,4 +21,4 @@ six==1.16.0
 sqlparse==0.4.2
 structlog==22.1.0
 urllib3==1.26.12
-WhiteNoise==5.4.0
+whitenoise==5.5.0
