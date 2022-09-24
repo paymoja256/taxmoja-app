@@ -35,7 +35,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['https://taxmoja-app.azurewebsites.net','https://*.127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://taxmoja-app.azurewebsites.net','https://5fac-62-8-83-6.eu.ngrok.io','http://*.127.0.0.1']
 
 # Application definition
 
@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
