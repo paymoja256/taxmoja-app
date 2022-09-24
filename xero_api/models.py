@@ -24,7 +24,7 @@ class XeroEfrisClientCredentials(ClientCredentials):
     
 class XeroEfrisGoodsConfiguration(EfrisGoodsConfiguration):
     XERO_ACCOUNT_CHOICES = [("300", "PURCHASES")]
-    XERO_TAX_CHOICES = [("TAX004", "EXEMPT"), ("TAX003", "VAT")]
+    XERO_TAX_CHOICES = [("NONE", "EXEMPT"), ("OUTPUT", "VAT")]
     
     
     client_account = models.ForeignKey(
@@ -40,7 +40,7 @@ class XeroEfrisGoodsConfiguration(EfrisGoodsConfiguration):
     xero_tax_rate = models.CharField(
         max_length=10,
         choices=XERO_TAX_CHOICES,
-        default="TAX004",
+        default="OUTPUT",
     )
     
     class Meta:
