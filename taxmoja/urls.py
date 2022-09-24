@@ -21,5 +21,5 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('efris/', include('efris.urls')),
+    path('xero/', include('xero_api.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

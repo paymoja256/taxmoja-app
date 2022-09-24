@@ -39,7 +39,9 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'mita_api.apps.MitaApiConfig',
     'efris.apps.EfrisConfig',
+    'xero_api.apps.XeroApiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -89,17 +91,17 @@ DATABASES = {
         'PASSWORD': env('DATABASE_PASS'),
         'HOST': env('DATABASE_HOST'),
         'PORT': env('DATABASE_PORT'),
-        'OPTIONS': {'sslmode': 'require'}
+        'OPTIONS': {}
     }
 }
 
 # Django Cache
 
 CACHES = {
-   'default': {
-      'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-      'LOCATION': 'xero_cache',
-   }
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'xero_cache',
+    }
 }
 
 # Password validation
