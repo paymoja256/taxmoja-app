@@ -2,6 +2,7 @@ import base64
 import hashlib
 import hmac
 from http import client
+from tracemalloc import get_object_traceback
 
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
@@ -19,10 +20,11 @@ from rest_framework.response import Response
 from xero import Xero
 from xero.auth import OAuth2Credentials
 from xero.constants import XeroScopes
-from .models import ClientCredentials
-from .services import get_xero_client_data, xero_send_invoice_data
+from .models import  XeroEfrisClientCredentials
+from .services import  xero_send_invoice_data
  
 from django.core.exceptions import BadRequest
+from django.shortcuts import get_object_or_404
 
 import structlog
 
@@ -34,7 +36,8 @@ def xero_invoice_webhook(request, client_acc_id):
     try:
 
         request_data = request.body
-        client_data = get_xero_client_data(client_acc_id)
+      
+        client_data = get_object_or_404(XeroEfrisClientCredentials, pk=client_acc_id)
         header_signature = request.headers['X-Xero-Signature']
         webhook_key = client_data.webhook_key
 
@@ -65,7 +68,7 @@ def xero_invoice_webhook(request, client_acc_id):
 
 
 def start_xero_auth_view(request, client_acc_id):
-    client_data = get_xero_client_data(client_acc_id)
+    client_data =  get_object_or_404(XeroEfrisClientCredentials, pk=client_acc_id)
     client_id = client_data.client_id
     client_secret = client_data.client_secret
     callback_uri = client_data.callback_uri
@@ -83,7 +86,7 @@ def start_xero_auth_view(request, client_acc_id):
     return HttpResponseRedirect(authorization_url)
 
 def process_callback_view(request, client_acc_id):
-    client_data = get_xero_client_data(client_acc_id)
+    client_data =  get_object_or_404(XeroEfrisClientCredentials, pk=client_acc_id)
     cred_state = client_data.cred_state
     credentials = OAuth2Credentials(**cred_state)
     auth_secret = request.build_absolute_uri()

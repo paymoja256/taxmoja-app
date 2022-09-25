@@ -4,11 +4,14 @@ from django.http import HttpResponse
 import json
 import dateutil.parser
 from xero import Xero
+from efris.models import EfrisCommodityCategories, EfrisCurrencyCodes, EfrisMeasureUnits
 from xero_api.models import XeroEfrisClientCredentials
 from xero.auth import OAuth2Credentials
 from mita_api.services import send_mita_request
+from django.shortcuts import get_object_or_404
 
 struct_logger = structlog.get_logger(__name__)
+
 
 def create_xero_goods_configuration(good_instance):
     try:
@@ -19,15 +22,24 @@ def create_xero_goods_configuration(good_instance):
         goods_code = good_instance['goods_code']
         purchase_price = good_instance['unit_price']
         unit_price = good_instance['unit_price']
-        currency = good_instance['currency']
-        measure_unit = good_instance['measure_unit']
-        commodity_tax_category = good_instance['commodity_tax_category']
-        xero_tax_rate = good_instance['xero_tax_rate']
         description = good_instance['description']
-        account_code = good_instance['xero_purchase_account']
-        client_account_id = good_instance['client_account_id']
+
+        currency = get_object_or_404(
+            EfrisCurrencyCodes, pk=good_instance['currency_id'])
+        measure_unit = get_object_or_404(
+            EfrisMeasureUnits, pk=good_instance['measure_unit_id'])
+        efris_commodity_tax_category = get_object_or_404(
+            EfrisCommodityCategories, pk=good_instance['commodity_tax_category_id'])
+        client_data = get_object_or_404(
+            XeroEfrisClientCredentials, pk=good_instance['client_account_id'])
+
+        xero_tax_rate = client_data.xero_standard_tax_rate_code
+        xero_purchase_account_code = client_data.xero_purchase_account
         is_product = True
         is_purchased = True
+
+        if efris_commodity_tax_category.tax_rate == 0.00:
+            xero_tax_rate = client_data.xero_exempt_tax_rate_code
 
         new_product = {
 
@@ -35,12 +47,12 @@ def create_xero_goods_configuration(good_instance):
 
             "PurchaseDetails": {
                 "UnitPrice": purchase_price,
-                "AccountCode": account_code,
+                "AccountCode": xero_purchase_account_code,
                 "TaxType": xero_tax_rate
             },
             "SalesDetails": {
                 "UnitPrice": unit_price,
-                "AccountCode": account_code,
+                "AccountCode": xero_purchase_account_code,
                 "TaxType": xero_tax_rate
             },
             "Name": goods_name,
@@ -48,8 +60,6 @@ def create_xero_goods_configuration(good_instance):
             "IsSold": True,
             "IsPurchased": is_purchased
         }
-
-        client_data = get_xero_client_data(client_account_id)
 
         cred_state = client_data.cred_state
         credentials = OAuth2Credentials(**cred_state)
@@ -74,7 +84,7 @@ def create_xero_goods_configuration(good_instance):
             "unit_price": unit_price,
             "measure_unit": measure_unit,
             "currency": currency,
-            "commodity_tax_category": commodity_tax_category,
+            "commodity_tax_category": efris_commodity_tax_category.efris_commodity_category_code,
             "goods_description": description
         }
 
@@ -120,7 +130,8 @@ def create_xero_goods_adjustment(good_instance):
         if adjust_type is None:
             adjust_type = ""
 
-        client_data = get_xero_client_data(client_account_id)
+        client_data = get_object_or_404(
+            XeroEfrisClientCredentials, pk=client_acc_id)
 
         cred_state = client_data.cred_state
         credentials = OAuth2Credentials(**cred_state)
@@ -180,20 +191,7 @@ def create_xero_goods_adjustment(good_instance):
                             error=str(ex),
 
                             )
-
-def get_xero_client_data(client_account_id):
-    try:
-
-        client_data = XeroEfrisClientCredentials.objects.get(id=client_account_id)
-        struct_logger.info(event='get_client_data', client_id=client_account_id, data=client_data,
-                           msg='Retrieving account client data')
-        return client_data
-
-    except Exception as ex:
-
-        struct_logger.info(event='get_client_data', error=str(ex), client=client_account_id)
-
-        raise BAD_REQUEST('Invalid request: Can not find client account {}'.format(str(ex)))
+        return HttpResponse("Error in Goods Adjustment {}   ".format(str(ex)))
 
 
 def xero_send_invoice_data(request, client_data):
