@@ -82,8 +82,8 @@ def create_xero_goods_configuration(good_instance):
             "goods_name": goods_name,
             "goods_code": goods_code,
             "unit_price": unit_price,
-            "measure_unit": measure_unit,
-            "currency": currency,
+            "measure_unit": measure_unit.measure_unit_code,
+            "currency": currency.currency_code,
             "commodity_tax_category": efris_commodity_tax_category.efris_commodity_category_code,
             "goods_description": description
         }
