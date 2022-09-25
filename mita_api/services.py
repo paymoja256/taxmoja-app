@@ -9,6 +9,8 @@ struct_logger = structlog.get_logger(__name__)
 
 def send_mita_request(url_ext, payload, client_account):
     mita_credentials=   MitaCredentials.objects.filter(active=True).first()
+    
+    struct_logger.info(event="send_mita_request", url_ext=url_ext, payload=payload, client_account=client_account)
     mita_url = mita_credentials.mita_url
     url = "{}/{}".format(mita_url,url_ext)
     headers = {
