@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             field=models.CharField(default='39efa556-8dda-4c81-83d3-a631e59eb6d3', max_length=100),
         ),
     ]
+

@@ -5,7 +5,7 @@ import json
 import dateutil.parser
 from xero import Xero
 from efris.models import EfrisCommodityCategories, EfrisCurrencyCodes, EfrisMeasureUnits
-from xero_api.models import XeroEfrisClientCredentials
+from xero_api.models import XeroEfrisClientCredentials, XeroEfrisGoodsConfiguration
 from xero.auth import OAuth2Credentials
 from mita_api.services import send_mita_request
 from django.shortcuts import get_object_or_404
@@ -34,12 +34,13 @@ def create_xero_goods_configuration(good_instance):
             XeroEfrisClientCredentials, pk=good_instance['client_account_id'])
 
         xero_tax_rate = client_data.xero_standard_tax_rate_code
+        if efris_commodity_tax_category.tax_rate == 0.00:
+            xero_tax_rate = client_data.xero_exempt_tax_rate_code
         xero_purchase_account_code = client_data.xero_purchase_account
         is_product = True
         is_purchased = True
 
-        if efris_commodity_tax_category.tax_rate == 0.00:
-            xero_tax_rate = client_data.xero_exempt_tax_rate_code
+        
 
         new_product = {
 
@@ -106,7 +107,7 @@ def create_xero_goods_adjustment(good_instance):
                            )
 
         xero_invoice_type = good_instance['xero_invoice_type']
-        goods_code = good_instance['goods_code']
+        
         purchase_price = good_instance['purchase_price']
         supplier = good_instance['supplier']
         supplier_tin = good_instance['supplier_tin']
@@ -115,19 +116,29 @@ def create_xero_goods_adjustment(good_instance):
         adjust_type = good_instance['adjust_type']
         operation_type = good_instance['operation_type']
         purchase_remarks = good_instance['purchase_remarks']
-        xero_tax_rate = good_instance['xero_tax_rate']
-        client_data = get_object_or_404(
-            XeroEfrisClientCredentials, pk=good_instance['client_account_id'])
+        
+        
+        goods_details= get_object_or_404(
+            XeroEfrisGoodsConfiguration,pk=good_instance['good_id'])
+        client_data = goods_details.client_account
+        
+        credentials = xero_client_credentials(client_data)
+        xero = Xero(credentials)
         contact = xero.contacts.get(u'{}'.format(
             client_data.xero_stock_in_contact_account))
+        
+        xero_tax_rate = client_data.xero_standard_tax_rate_code
+        if goods_details.commodity_tax_category.tax_rate == 0.00:
+            xero_tax_rate = client_data.xero_exempt_tax_rate_code
+        print('contact', contact)
+        goods_code =goods_details.goods_code
 
         line_items = []
 
         if adjust_type is None:
             adjust_type = ""
 
-        credentials = xero_client_credentials(client_data)
-        xero = Xero(credentials)
+        
 
         line_item = {
             "ItemCode": goods_code,
@@ -135,7 +146,7 @@ def create_xero_goods_adjustment(good_instance):
             "Quantity": quantity,
             "UnitAmount": purchase_price,
             "TaxType": xero_tax_rate,
-            "AccountCode": "300"
+            "AccountCode": client_data.xero_purchase_account
         }
 
         line_items.append(line_item)
