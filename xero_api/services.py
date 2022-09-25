@@ -61,17 +61,12 @@ def create_xero_goods_configuration(good_instance):
             "IsPurchased": is_purchased
         }
 
-        cred_state = client_data.cred_state
-        credentials = OAuth2Credentials(**cred_state)
+      
 
         struct_logger.info(event='create_xero_goods_configuration', client_data=client_data.cred_state,
-                           account=good_instance, credentials=type(credentials))
+                           account=good_instance)
 
-        if credentials.expired():
-            credentials.refresh()
-            client_data.cred_state = credentials.state
-            client_data.save()
-
+        credentials = xero_client_credentials(client_data)
         xero = Xero(credentials)
         item = xero.items.put(new_product)
 
@@ -121,27 +116,18 @@ def create_xero_goods_adjustment(good_instance):
         operation_type = good_instance['operation_type']
         purchase_remarks = good_instance['purchase_remarks']
         xero_tax_rate = good_instance['xero_tax_rate']
-        account_code = good_instance['xero_purchase_account']
-        currency = good_instance['currency']
-        client_account_id = good_instance['client_account_id']
+        client_data = get_object_or_404(
+            XeroEfrisClientCredentials, pk=good_instance['client_account_id'])
+        contact = xero.contacts.get(u'{}'.format(
+            client_data.xero_stock_in_contact_account))
 
         line_items = []
 
         if adjust_type is None:
             adjust_type = ""
 
-        client_data = get_object_or_404(
-            XeroEfrisClientCredentials, pk=client_acc_id)
-
-        cred_state = client_data.cred_state
-        credentials = OAuth2Credentials(**cred_state)
-        if credentials.expired():
-            credentials.refresh()
-            client_data.cred_state = credentials.state
-            client_data.save()
+        credentials = xero_client_credentials(client_data)
         xero = Xero(credentials)
-
-        contact = xero.contacts.get(u'39efa556-8dda-4c81-83d3-a631e59eb6d3')
 
         line_item = {
             "ItemCode": goods_code,
@@ -194,6 +180,7 @@ def create_xero_goods_adjustment(good_instance):
         return HttpResponse("Error in Goods Adjustment {}   ".format(str(ex)))
 
 
+
 def xero_send_invoice_data(request, client_data):
     try:
         data = json.loads(request.decode('utf8').replace("'", '"'))
@@ -211,12 +198,7 @@ def xero_send_invoice_data(request, client_data):
                            event_category=event_category
                            )
 
-        cred_state = client_data.cred_state
-        credentials = OAuth2Credentials(**cred_state)
-        if credentials.expired():
-            credentials.refresh()
-            client_data.cred_state = credentials.state
-            client_data.save()
+        credentials = xero_client_credentials(client_data)
         xero = Xero(credentials)
 
         invoices = xero.invoices.get(u'{}'.format(invoice_id))
@@ -237,12 +219,7 @@ def generate_mita_invoice(xero_invoices, client_data):
             try:
 
                 xero_credit_note = xero_invoice['CreditNotes'][0]
-                cred_state = client_data.cred_state
-                credentials = OAuth2Credentials(**cred_state)
-                if credentials.expired():
-                    credentials.refresh()
-                    client_data.cred_state = credentials.state
-                    client_data.save()
+                credentials = xero_client_credentials(client_data)
                 xero = Xero(credentials)
                 credit_note = xero.creditnotes.get(
                     u'{}'.format(xero_credit_note['ID']))
@@ -405,3 +382,14 @@ def generate_mita_invoice(xero_invoices, client_data):
                 }
                 print(mita_payload)
             send_mita_request('invoice/issue', mita_payload, client_data)
+
+
+
+def xero_client_credentials(client_data):
+    cred_state = client_data.cred_state
+    credentials = OAuth2Credentials(**cred_state)
+    if credentials.expired():
+        credentials.refresh()
+        client_data.cred_state = credentials.state
+        client_data.save()
+    return credentials

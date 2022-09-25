@@ -21,6 +21,11 @@ class XeroEfrisClientCredentials(ClientCredentials):
         max_length=10,
         default="300",
     )
+    
+    xero_stock_in_contact_account = models.CharField(
+        max_length=255,
+        default="39efa556-8dda-4c81-83d3-a631e59eb6d3",
+    )
     xero_exempt_tax_rate_code = models.CharField(
         max_length=10,
         default="NONE",
