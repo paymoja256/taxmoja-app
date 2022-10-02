@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import *
+
+# class QuickbooksEfrisClientCredentialsAdmin(admin.ModelAdmin):
+#     list_display = ['id','authorisation_id', 'company_name','webhook_key', 'client_secret']
+
+admin.site.register(QuickbooksEfrisClientCredentials)

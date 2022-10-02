@@ -17,7 +17,7 @@ class ClientCredentials(models.Model):
     )
 
     class Meta:
-        verbose_name = "MiTa Credentials"
+        verbose_name = "MiTa Credentialsk"
         verbose_name_plural = "MiTa Credentials"
 
     def __str__(self):

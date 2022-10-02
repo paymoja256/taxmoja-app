@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class QuickbooksApiConfig(AppConfig):
+class ClientAuthorizationConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'quickbooks_api'
+    name = 'client_authorization'

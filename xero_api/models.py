@@ -1,5 +1,6 @@
 from django.db import models
 from jsonfield import JSONField
+from client_authorization.models import OAuth2ClientCredentials
 
 from efris.models import ClientCredentials, EfrisGoodsAdjustment, EfrisGoodsConfiguration
 
@@ -9,13 +10,8 @@ from django.db.models.signals import post_save
 # Create your models here.
 
 
-class XeroEfrisClientCredentials(ClientCredentials):
-    webhook_key = models.CharField(max_length=100)
-    client_id = models.CharField(max_length=100)
-    client_secret = models.CharField(max_length=100)
-    callback_uri = models.CharField(max_length=150)
-    cred_state = JSONField(blank=True, null=True
-                           )
+class XeroEfrisClientCredentials(ClientCredentials,OAuth2ClientCredentials):
+    
 
     xero_purchase_account = models.CharField(
         max_length=10,
@@ -37,8 +33,8 @@ class XeroEfrisClientCredentials(ClientCredentials):
     )
 
     class Meta:
-        verbose_name = " Xero Efris Client Credentials"
-        verbose_name_plural = "Xero Efris Client Credentials"
+        verbose_name = "Efris Client Credentials"
+        verbose_name_plural = "Efris Client Credentials"
 
     def __str__(self):
         return self.company_name
@@ -52,8 +48,8 @@ class XeroEfrisGoodsConfiguration(EfrisGoodsConfiguration):
     )
 
     class Meta:
-        verbose_name = " Xero Efris Goods Configuration"
-        verbose_name_plural = " Xero Efris Goods Configuration"
+        verbose_name = " Efris Goods Configuration"
+        verbose_name_plural = "Efris Goods Configuration"
 
     def __str__(self):
         return self.goods_name
@@ -74,8 +70,8 @@ class XeroEfrisGoodsAdjustment(EfrisGoodsAdjustment):
     )
 
     class Meta:
-        verbose_name = "Xero Efris Goods Adjustment"
-        verbose_name_plural = "Xero Efris Goods Adjustment"
+        verbose_name = "Efris Goods Adjustment"
+        verbose_name_plural = "Efris Goods Adjustment"
 
     def __str__(self):
         return self.good.goods_name

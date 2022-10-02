@@ -22,3 +22,5 @@ sqlparse==0.4.2
 structlog==22.1.0
 urllib3==1.26.12
 whitenoise
+intuit-oauth
+python-quickbooks

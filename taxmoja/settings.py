@@ -40,15 +40,18 @@ CSRF_TRUSTED_ORIGINS = ['https://taxmoja-app.azurewebsites.net','https://5fac-62
 # Application definition
 
 INSTALLED_APPS = [
-    'mita_api.apps.MitaApiConfig',
-    'efris.apps.EfrisConfig',
-    'xero_api.apps.XeroApiConfig',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'client_authorization.apps.ClientAuthorizationConfig',
+    'mita_api.apps.MitaApiConfig',
+    'efris.apps.EfrisConfig', 
+    'xero_api.apps.XeroApiConfig',
+    'quickbooks_api.apps.QuickbooksApiConfig',
 ]
 
 MIDDLEWARE = [
