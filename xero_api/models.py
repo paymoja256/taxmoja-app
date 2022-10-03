@@ -43,7 +43,7 @@ class XeroEfrisClientCredentials(ClientCredentials,OAuth2ClientCredentials):
 class XeroEfrisGoodsConfiguration(EfrisGoodsConfiguration):
 
     client_account = models.ForeignKey(
-        XeroEfrisClientCredentials, on_delete=models.CASCADE
+        XeroEfrisClientCredentials, null=True, blank=True, on_delete=models.SET_NULL
 
     )
 
@@ -59,7 +59,7 @@ class XeroEfrisGoodsAdjustment(EfrisGoodsAdjustment):
     XERO_ADJUST_CHOICES = [("ACCPAY", "INCREASE"), ("ACCREC", "DECREASE")]
 
     good = models.ForeignKey(
-        XeroEfrisGoodsConfiguration, on_delete=models.CASCADE
+        XeroEfrisGoodsConfiguration,  null=True, blank=True,on_delete=models.SET_NULL
 
     )
 
