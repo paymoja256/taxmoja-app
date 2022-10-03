@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'efris.apps.EfrisConfig', 
     'xero_api.apps.XeroApiConfig',
     'quickbooks_api.apps.QuickbooksApiConfig',
+    'import_export',
 ]
 
 MIDDLEWARE = [
