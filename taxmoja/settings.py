@@ -35,7 +35,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['https://taxmoja-app.azurewebsites.net','https://5fac-62-8-83-6.eu.ngrok.io','http://*.127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://taxmoja-app.azurewebsites.net','https://*.taxmoja.com/','https://5fac-62-8-83-6.eu.ngrok.io','http://*.127.0.0.1']
 
 # Application definition
 
