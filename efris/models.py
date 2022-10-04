@@ -106,7 +106,7 @@ class EfrisGoodsConfiguration(models.Model):
 
 class EfrisGoodsAdjustment(models.Model):
 
-    STOCK_IN_TYPE_CHOICES = [
+    STOCK_IN_TYPE_CHOICES = [("", "NONE"),
         ("101", "IMPORT"), ("102", "LPO"), ("103", "MANUFACTURING/ASSEMBLY"), ("104", "OPENING STOCK")]
     ADJUST_TYPE_CHOICES = [("", "NONE"), ("101", "EXPIRED"), ("102", "DAMAGED"), ("104", "OTHERS"),
                            ("103", "PERSONAL USES"), ("105", "RAW MATERIALS")]
@@ -114,8 +114,8 @@ class EfrisGoodsAdjustment(models.Model):
         ("101", "INCREASE INVENTORY"), ("102", "DECREASE INVENTORY")]
 
     purchase_price = models.FloatField(help_text='Purchase Price')
-    supplier = models.CharField(max_length=20, help_text='Supplier')
-    supplier_tin = models.CharField(max_length=20, help_text='Supplier Tin')
+    supplier = models.CharField(max_length=20,blank=True, null=True, help_text='Supplier')
+    supplier_tin = models.CharField(max_length=20, blank=True, null=True,help_text='Supplier Tin')
     quantity = models.CharField(max_length=20, help_text='Quantity')
 
     currency = models.ForeignKey(
@@ -126,6 +126,7 @@ class EfrisGoodsAdjustment(models.Model):
     stock_in_type = models.CharField(
         max_length=10,
         choices=STOCK_IN_TYPE_CHOICES,
+        blank=True, null=True,
         default="101",
     )
 
@@ -133,7 +134,7 @@ class EfrisGoodsAdjustment(models.Model):
         max_length=10,
         choices=ADJUST_TYPE_CHOICES,
         default="",
-        blank=True, null=True
+        blank=True, null=True,
     )
 
     operation_type = models.CharField(

@@ -102,7 +102,7 @@ def create_xero_goods_configuration(good_instance):
 def create_xero_goods_adjustment(good_instance):
     try:
 
-        struct_logger.info(event=create_xero_goods_adjustment,
+        struct_logger.info(event='create_xero_goods_adjustment',
                            product=good_instance,
                            )
 
@@ -120,13 +120,17 @@ def create_xero_goods_adjustment(good_instance):
         
         goods_details= get_object_or_404(
             XeroEfrisGoodsConfiguration,pk=good_instance['good_id'])
-        client_data = goods_details.client_account
         
+        
+        client_data = goods_details.client_account
+        # print(client_data.__dict__)
+        # print(client_data.cred_state)
+        cred_state = goods_details.client_account.cred_state
         credentials = xero_client_credentials(client_data)
         xero = Xero(credentials)
-        contact = xero.contacts.get(u'{}'.format(
-            client_data.xero_stock_in_contact_account))
-        
+        print(credentials)
+        print(client_data.xero_stock_in_contact_account)
+        contact =xero.contacts.all()[0]
         xero_tax_rate = client_data.xero_standard_tax_rate_code
         if goods_details.commodity_tax_category.tax_rate == 0.00:
             xero_tax_rate = client_data.xero_exempt_tax_rate_code
@@ -162,7 +166,7 @@ def create_xero_goods_adjustment(good_instance):
 
         invoice = xero.invoices.put(invoice)
 
-        struct_logger.info(event=create_xero_goods_adjustment,
+        struct_logger.info(event='create_xero_goods_adjustment',
                            xero_invoice=invoice,
                            )
 
@@ -184,7 +188,7 @@ def create_xero_goods_adjustment(good_instance):
         return HTTPResponse("xero Adjustment saved {}  \n Efris Item Saved {} ".format(invoice, mita_stock))
 
     except Exception as ex:
-        struct_logger.error(event=create_xero_goods_adjustment,
+        struct_logger.error(event='create_xero_goods_adjustment',
                             error=str(ex),
 
                             )
