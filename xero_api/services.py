@@ -207,7 +207,7 @@ def xero_send_invoice_data(request, client_data):
 
         struct_logger.info(event="xero_incoming_invoice",
                            xero_data=data,
-                           dt=type(data),
+                           dt=data,
                            invoice_id=invoice_id,
                            event_type=event_type,
                            event_category=event_category
@@ -217,6 +217,8 @@ def xero_send_invoice_data(request, client_data):
         xero = Xero(credentials)
 
         invoices = xero.invoices.get(u'{}'.format(invoice_id))
+        
+        print(invoices)
 
         generate_mita_invoice(invoices, client_data)
 
@@ -228,8 +230,8 @@ def xero_send_invoice_data(request, client_data):
 
 def generate_mita_invoice(xero_invoices, client_data):
     for xero_invoice in xero_invoices:
-
-        if xero_invoice['Status'] == "AUTHORISED":
+        # if xero_invoice['Status'] in ("AUTHORISED"):
+        if xero_invoice['Status'] in ("AUTHORISED", "PAID"):
 
             try:
 

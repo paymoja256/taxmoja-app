@@ -73,8 +73,8 @@ class EfrisCommodityCategories(models.Model):
 
 class EfrisGoodsConfiguration(models.Model):
 
-    goods_name = models.CharField(max_length=20, help_text='Goods Name')
-    goods_code = models.CharField(max_length=20, help_text='Goods Code')
+    goods_name = models.CharField(max_length=200, help_text='Goods Name')
+    goods_code = models.CharField(max_length=200, help_text='Goods Code')
 
     commodity_tax_category = models.ForeignKey(
         EfrisCommodityCategories, on_delete=models.CASCADE,
