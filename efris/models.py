@@ -114,7 +114,7 @@ class EfrisGoodsAdjustment(models.Model):
         ("101", "INCREASE INVENTORY"), ("102", "DECREASE INVENTORY")]
 
     purchase_price = models.FloatField(help_text='Purchase Price')
-    supplier = models.CharField(max_length=20,blank=True, null=True, help_text='Supplier')
+    supplier = models.CharField(max_length=200,blank=True, null=True, help_text='Supplier')
     supplier_tin = models.CharField(max_length=20, blank=True, null=True,help_text='Supplier Tin')
     quantity = models.CharField(max_length=20, help_text='Quantity')
 
