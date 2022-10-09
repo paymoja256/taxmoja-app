@@ -370,7 +370,7 @@ def generate_mita_invoice(xero_invoices, client_data):
                         "currency": xero_invoice['CurrencyCode'],
                         "invoice_type": "1",
                         "invoice_kind": "1",
-                        "goods_description": xero_invoice['InvoiceNumber'],
+                        "goods_description":  xero_invoice['Reference'],
                         "industry_code": "",
                         "original_instance_invoice_id": "",
                         "return_reason": "",
