@@ -398,7 +398,7 @@ def generate_mita_invoice(xero_invoices, client_data):
 
                 }
                 print(mita_payload)
-            send_mita_request('invoice/issue', mita_payload, client_data)
+            send_mita_request('invoice/queue', mita_payload, client_data)
 
 
 
