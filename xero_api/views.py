@@ -98,3 +98,5 @@ def process_callback_view(request, client_acc_id):
     client_data.save()
     return HttpResponse("You are authenticated")
 
+def index(request):
+    return render(request, 'homepage/index.html')
