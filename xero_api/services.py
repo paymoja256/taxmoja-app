@@ -364,7 +364,7 @@ def generate_mita_invoice(xero_invoices, client_data):
 
                 mita_payload = {
                     "invoice_details": {
-                        "invoice_code":xero_invoice['Reference'],
+                        "invoice_code":xero_invoice['InvoiceID'],
                         "cashier": "Eseza Muwanga",
                         "payment_mode": "107",
                         "currency": xero_invoice['CurrencyCode'],
@@ -394,7 +394,7 @@ def generate_mita_invoice(xero_invoices, client_data):
                         "is_privileged": is_priviledged,
                         "local_purchase_order": ""
                     },
-                    "instance_invoice_id": xero_invoice['Reference']
+                    "instance_invoice_id": xero_invoice['InvoiceID']
 
                 }
                 print(mita_payload)
