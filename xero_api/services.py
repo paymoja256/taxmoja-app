@@ -336,7 +336,7 @@ def generate_mita_invoice(xero_invoices, client_data):
 
                 contact_groups = xero_invoice['Contact']['ContactGroups']
 
-                if contact_groups[0]["Name"] in ("Business", "Government"):
+                if contact_groups[0]["Name"] in ("Business","business","Government"):
                     buyer_type = "0"
 
                 elif contact_groups[0]["Name"] == "Foreignor":
@@ -347,10 +347,10 @@ def generate_mita_invoice(xero_invoices, client_data):
                     buyer_type = "1"
 
                 try:
-                    buyer_tax_pin = xero_invoice['Contact']['CompanyNumber']
+                    buyer_tax_pin = xero_invoice['Contact']['TaxNumber']
 
                 except Exception as ex:
-
+                    buyer_type = "1"
                     buyer_tax_pin = ""
 
                 for good in xero_invoice['LineItems']:
