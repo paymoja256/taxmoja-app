@@ -33,8 +33,8 @@ class XeroEfrisClientCredentials(ClientCredentials,OAuth2ClientCredentials):
     )
 
     class Meta:
-        verbose_name = "Efris Client Credentials"
-        verbose_name_plural = "Efris Client Credentials"
+        verbose_name = "Client Credentials"
+        verbose_name_plural = "Client Credentials"
 
     def __str__(self):
         return self.company_name
@@ -48,8 +48,8 @@ class XeroEfrisGoodsConfiguration(EfrisGoodsConfiguration):
     )
 
     class Meta:
-        verbose_name = " Efris Goods Configuration"
-        verbose_name_plural = "Efris Goods Configuration"
+        verbose_name = "Goods Configuration"
+        verbose_name_plural = "Goods Configuration"
 
     def __str__(self):
         return self.goods_name
@@ -70,8 +70,8 @@ class XeroEfrisGoodsAdjustment(EfrisGoodsAdjustment):
     )
 
     class Meta:
-        verbose_name = "Efris Goods Adjustment"
-        verbose_name_plural = "Efris Goods Adjustment"
+        verbose_name = "Goods Adjustment"
+        verbose_name_plural = "Goods Adjustment"
 
     def __str__(self):
         return self.good.goods_name

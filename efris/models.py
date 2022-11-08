@@ -17,8 +17,8 @@ class ClientCredentials(models.Model):
     )
 
     class Meta:
-        verbose_name = "MiTa Credentialsk"
-        verbose_name_plural = "MiTa Credentials"
+        verbose_name = "Mita credentials"
+        verbose_name_plural = "Mita credentials"
 
     def __str__(self):
         return self.company_name
@@ -34,8 +34,8 @@ class EfrisCurrencyCodes(models.Model):
         return self.currency_name
 
     class Meta:
-        verbose_name = "Efris Currency Code"
-        verbose_name_plural = "Efris Currency Codes"
+        verbose_name = "Currency Code"
+        verbose_name_plural = "Currency Codes"
 
 class EfrisMeasureUnits(models.Model):
 
@@ -47,8 +47,8 @@ class EfrisMeasureUnits(models.Model):
         return self.measure_unit_name
 
     class Meta:
-        verbose_name = "Efris Measure Unit"
-        verbose_name_plural = "Efris Measure Units"
+        verbose_name = "Measure Unit"
+        verbose_name_plural = "Measure Units"
 
 
 class EfrisCommodityCategories(models.Model):
@@ -67,8 +67,8 @@ class EfrisCommodityCategories(models.Model):
         return self.efris_commodity_category_name
 
     class Meta:
-        verbose_name = "Efris Commodity Category"
-        verbose_name_plural = "Efris Commodity Categories"
+        verbose_name = "Commodity Category"
+        verbose_name_plural = "Commodity Categories"
 
 
 class EfrisGoodsConfiguration(models.Model):

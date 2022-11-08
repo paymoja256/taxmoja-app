@@ -12,8 +12,8 @@ class QuickbooksEfrisClientCredentials(ClientCredentials,OAuth2ClientCredentials
 
 
     class Meta:
-        verbose_name = " Efris Client Credentials"
-        verbose_name_plural = "Efris Client Credentials"
+        verbose_name = "Client Credentials"
+        verbose_name_plural = "Client Credentials"
 
     def __str__(self):
         return self.company_name

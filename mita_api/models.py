@@ -10,8 +10,8 @@ class MitaCredentials(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = "Mita Credential"
-        verbose_name_plural = "Mita Credentials"
+        verbose_name = "URL Credential"
+        verbose_name_plural = "URL Credentials"
 
     def __str__(self):
         return self.mita_url
