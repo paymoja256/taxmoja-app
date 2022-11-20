@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('xero/', include('xero_api.urls')),
     path('qb/', include('quickbooks_api.urls')),
+    path('', include('homepage.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 admin.site.site_header = "Taxmoja Admin"

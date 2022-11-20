@@ -31,11 +31,12 @@ environ.Env.read_env()
 SECRET_KEY = 'django-insecure-cu(s1x040qokgnoip_13#iv0st8!ftg%2-17f7ro=+=#k3f8j('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['https://taxmoja-app.azurewebsites.net','https://*.taxmoja.com/','https://5fac-62-8-83-6.eu.ngrok.io','http://*.127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://taxmoja-app.azurewebsites.net',
+                        'https://*.taxmoja.com/', 'https://5fac-62-8-83-6.eu.ngrok.io', 'http://*.127.0.0.1']
 
 # Application definition
 
@@ -49,9 +50,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'client_authorization.apps.ClientAuthorizationConfig',
     'mita_api.apps.MitaApiConfig',
-    'efris.apps.EfrisConfig', 
+    'efris.apps.EfrisConfig',
     'xero_api.apps.XeroApiConfig',
     'quickbooks_api.apps.QuickbooksApiConfig',
+    'homepage.apps.HomepageConfig',
     'import_export',
 ]
 
