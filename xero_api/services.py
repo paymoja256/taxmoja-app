@@ -1,3 +1,4 @@
+import datetime
 from http.client import BAD_REQUEST, HTTPResponse
 import structlog
 from django.http import HttpResponse
@@ -155,11 +156,13 @@ def create_xero_goods_adjustment(good_instance):
 
         line_items.append(line_item)
 
+        invoice_date = datetime.datetime.utcnow().isoformat() + "Z"
+
         invoice = {
             "LineItems": line_items,
             "Contact": contact,
-            "DueDate": dateutil.parser.parse("2020-09-03T00:00:00Z"),
-            "Date": dateutil.parser.parse("2020-07-03T00:00:00Z"),
+            "DueDate": dateutil.parser.parse(invoice_date),
+            "Date": dateutil.parser.parse(invoice_date),
             "Type": xero_invoice_type,
             "Status": "AUTHORISED"
         }
