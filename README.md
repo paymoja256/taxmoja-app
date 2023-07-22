@@ -1,2 +1,11 @@
 # django-taxmoja
-Integration of different software like xero in taxmoja
+App integration of different ERP's with Taxmoja API.
+
+ERP's Supported Include
+
+OrderEazy
+Xero
+Quickbooks
+Generic
+Dear
+
