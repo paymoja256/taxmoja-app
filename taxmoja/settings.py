@@ -48,13 +48,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'client_authorization.apps.ClientAuthorizationConfig',
-    'mita_api.apps.MitaApiConfig',
-    'efris.apps.EfrisConfig',
-    'xero_api.apps.XeroApiConfig',
-    'quickbooks_api.apps.QuickbooksApiConfig',
-    'homepage.apps.HomepageConfig',
-    'import_export',
+     # Rest Framework
+    "rest_framework",
+    "import_export",
+    # Taxmoja Apps
+    "oauth2.apps.ClientAuthorizationConfig",
+    "api_mita.apps.MitaApiConfig",
+    "api_xero.apps.XeroApiConfig",
+    "api_quickbooks.apps.QuickbooksApiConfig",
+    "api_dear.apps.DearApiConfig",
+    "api_ordereasy.apps.ApiOrdereasyConfig",
+    "manager_invoice.apps.InvoiceManagerConfig",
+    "manager_inventory.apps.ProductManagerConfig",
+    "manager_efris.apps.EfrisConfig",
+  
 ]
 
 MIDDLEWARE = [
