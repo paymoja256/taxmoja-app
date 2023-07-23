@@ -469,7 +469,7 @@ def create_goods_adjustment(request, client_acc_id):
                 message="sending dear goods adjustment to mita",
             )
             efris_response = send_mita_request(
-                "stock/ajustment", efris_stock_adjustment_payload, client_data
+                "stock/adjustment", efris_stock_adjustment_payload, client_data
             )
 
             return efris_response
@@ -482,6 +482,50 @@ def create_goods_adjustment(request, client_acc_id):
         )
         return {
             "sku": product_data,
+            "message": "Could not adjust product quantities",
+            "error": ex,
+        }
+
+
+def create_goods_stock_in(dear_stock, client_acc_id,operation_type="101",
+    adjust_type="",
+    stock_in_type="103"):
+
+     try:
+        client_data = get_object_or_404(DearEfrisClientCredentials, pk=client_acc_id)
+        for stock in dear_stock:
+            struct_logger.info(
+                event="dear stock adjustment",
+                stock_data=stock,
+                            )
+            efris_stock_adjustment_payload = {
+                "goods_code": stock["ID"],
+                "supplier": "",
+                "supplier_tin": "",
+                "stock_in_type": stock_in_type,
+                "quantity": stock["OnOrder"],
+                "purchase_price": "1000",
+                "purchase_remarks": "{}-{}".format(stock["SKU"],stock["Name"]),
+                "operation_type": operation_type,
+                "adjust_type": adjust_type,
+            }
+            struct_logger.info(
+                event="create_dear_goods_adjustment",
+                efris_product=efris_stock_adjustment_payload,
+                message="sending dear goods adjustment to mita",
+            )
+            efris_response = send_mita_request(
+                "stock/adjustment", efris_stock_adjustment_payload, client_data
+            )
+
+            return efris_response
+     except Exception as ex:
+        struct_logger.info(
+            event="create_dear_goods_adjustment",
+            error=str(ex),
+            message="Could not configure product",
+        )
+        return {
             "message": "Could not adjust product quantities",
             "error": ex,
         }

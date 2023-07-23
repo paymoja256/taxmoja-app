@@ -7,6 +7,7 @@ from api_mita.services import send_mita_request
 from .services import (
     create_goods_adjustment,
     create_goods_configuration,
+    create_goods_stock_in,
     process_credit_note,
     process_invoice,
     send_dear_api_request,
@@ -78,7 +79,7 @@ def stock_adjustment_webhook(request, client_acc_id):
 
         struct_logger.info(event="dear stock adjustment", stock=request)
 
-        goods_configuration = create_goods_adjustment(request, client_acc_id)
+        goods_configuration = create_goods_stock_in(request, client_acc_id)
 
         struct_logger.info(event="processing dear goods adjustment", response=goods_configuration)
 
