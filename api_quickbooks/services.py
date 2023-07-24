@@ -205,7 +205,7 @@ def clean_buyer_type(buyer_details):
 # Stock
 def process_item(id, operation, client_data):
     item_data = get_item_by_id(client_data, id)
-    product_data = json.loads(product_data)["Item"]
+    product_data = json.loads(item_data)["Item"]
     if operation == "create":
         mita_response = create_goods_configuration(product_data, client_data)
     elif operation == "update":
