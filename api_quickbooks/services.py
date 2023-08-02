@@ -11,9 +11,6 @@ from requests.auth import HTTPBasicAuth
 from api_mita.services import send_mita_request
 
 
-from api_quickbooks.models import QuickbooksEfrisClientCredentials
-
-
 struct_logger = structlog.get_logger(__name__)
 # Processing webhook
 
@@ -25,8 +22,8 @@ def process_webhook(request, client_data):
         event = notification["dataChangeEvent"]["entities"][0]
         event_name = event["name"]
         event_id = event["id"]
-        process_name = event_name.lower()
         operation = event["operation"].lower()
+        process_name = event_name.lower()
         event_process = globals()["process_{}".format(process_name)]
 
         response = event_process(event_id, operation, client_data)
@@ -283,11 +280,18 @@ def create_goods_configuration(product_data, client_data):
             quickbooks_item=product_data,
             message="new item received from quickbooks",
         )
+        try:
+            goods_name = product_data["Name"]
+            goods_code = product_data["Id"]
+            unit_price = product_data["UnitPrice"]
+            description = product_data["Description"]
+        except Exception as ex:
 
-        goods_name = product_data["Name"]
-        goods_code = product_data["Id"]
-        unit_price = product_data["UnitPrice"]
-        description = product_data["Description"]
+            goods_name = product_data["Name"]
+            goods_code = product_data["Id"]
+            unit_price = '1.0'
+            description = product_data["FullyQualifiedName"]
+
         measure_unit = client_data.stock_configuration_measure_unit
         currency = client_data.stock_configuration_currency
         commodity_category = client_data.stock_configuration_commodity_category

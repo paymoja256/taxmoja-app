@@ -57,7 +57,7 @@ def process_invoice(response, client_acc_id):
 
         goods_details, invoice = clean_goods_details(invoices)
 
-        tax_invoice = create_efris_invoice(
+        tax_invoice = create_mita_invoice(
             invoice,
             invoice_data,
             buyer_details,
@@ -73,10 +73,10 @@ def process_invoice(response, client_acc_id):
         struct_logger.info(
             event="dear_invoice_processing",
             message="Sending invoice to mita",
-            response=tax_invoice,
+            response=tax_invoice.text,
         )
 
-        return tax_invoice
+        return tax_invoice.text
 
     except Exception as ex:
         struct_logger.error(
@@ -143,7 +143,7 @@ def process_credit_note(response, client_acc_id):
 
         goods_details, invoice = clean_goods_details(credit_notes)
 
-        tax_invoice = create_efris_invoice(
+        tax_invoice = create_mita_invoice(
             invoice,
             invoice_data,
             buyer_details,
@@ -204,11 +204,7 @@ def clean_currency_product(currency):
         return "104"
 
 
-def get_tax_rate(tax_rule):
-    if tax_rule.upper() == "VAT":
-        return True
 
-    return False
 
 
 def clean_tax_pin(customer, client_data):
@@ -276,20 +272,22 @@ def clean_goods_details(invoices):
         goods = invoice["Lines"]
         goods_details = []
         for item in goods:
-            item_tax = get_tax_rate(item["TaxRule"])
+         
+         
             good = {
                 "good_code": item[
                     "ProductID"
-                ],  # '21d3258a-db5e-4ba4-a14f-27028617b4ff',  #
+                ], 
                 "quantity": item["Quantity"],
                 "sale_price": item["Price"],
+                "tax_category": item["TaxRule"],
             }
 
             goods_details.append(good)
         return goods_details, invoice
 
 
-def create_efris_invoice(
+def create_mita_invoice(
     invoice,
     invoice_data,
     buyer_details,
@@ -356,9 +354,9 @@ def create_efris_invoice(
         "instance_invoice_id": invoice_code,
     }
     struct_logger.info(event="sending dear invoice to mita", mita_payload=mita_payload)
-    return send_mita_request("invoice/queue", mita_payload, client_data)
+    return send_mita_request("invoice/queue?api_extension=_dear", mita_payload, client_data)
 
-
+         
 def create_goods_configuration(request, client_acc_id):
     # Get local client
     client_data = get_object_or_404(DearEfrisClientCredentials, pk=client_acc_id)
@@ -487,17 +485,16 @@ def create_goods_adjustment(request, client_acc_id):
         }
 
 
-def create_goods_stock_in(dear_stock, client_acc_id,operation_type="101",
-    adjust_type="",
-    stock_in_type="103"):
-
-     try:
+def create_goods_stock_in(
+    dear_stock, client_acc_id, operation_type="101", adjust_type="", stock_in_type="103"
+):
+    try:
         client_data = get_object_or_404(DearEfrisClientCredentials, pk=client_acc_id)
         for stock in dear_stock:
             struct_logger.info(
                 event="dear stock adjustment",
                 stock_data=stock,
-                            )
+            )
             efris_stock_adjustment_payload = {
                 "goods_code": stock["ID"],
                 "supplier": "",
@@ -505,7 +502,7 @@ def create_goods_stock_in(dear_stock, client_acc_id,operation_type="101",
                 "stock_in_type": stock_in_type,
                 "quantity": stock["OnOrder"],
                 "purchase_price": "1000",
-                "purchase_remarks": "{}-{}".format(stock["SKU"],stock["Name"]),
+                "purchase_remarks": "{}-{}".format(stock["SKU"], stock["Name"]),
                 "operation_type": operation_type,
                 "adjust_type": adjust_type,
             }
@@ -519,7 +516,7 @@ def create_goods_stock_in(dear_stock, client_acc_id,operation_type="101",
             )
 
             return efris_response
-     except Exception as ex:
+    except Exception as ex:
         struct_logger.info(
             event="create_dear_goods_adjustment",
             error=str(ex),

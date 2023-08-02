@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 import structlog
 import requests
+from api_dear.models import DearEfrisClientCredentials
 from api_mita.services import send_mita_request
 from .models import OEEfrisClientCredentials
 
