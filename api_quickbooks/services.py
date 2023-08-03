@@ -125,7 +125,7 @@ def create_efris_invoice(
 
     buyer_type, buyer_name = clean_buyer_type(buyer_details)
 
-    tax_pin = "1000522479"
+    tax_pin = ""
 
     mita_payload = {
         "invoice_details": {
@@ -193,8 +193,10 @@ def get_tax_rate(tax_rule):
 
 
 def clean_buyer_type(buyer_details):
+
+    
     if buyer_details["CompanyName"]:
-        return "0", buyer_details["CompanyName"]
+        return "1", buyer_details["CompanyName"]
 
     return "1", buyer_details["DisplayName"]
 
