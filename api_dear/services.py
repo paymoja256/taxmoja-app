@@ -204,9 +204,6 @@ def clean_currency_product(currency):
         return "104"
 
 
-
-
-
 def clean_tax_pin(customer, client_data):
     tax_pin = (
         customer["TaxNumber"]
@@ -272,12 +269,8 @@ def clean_goods_details(invoices):
         goods = invoice["Lines"]
         goods_details = []
         for item in goods:
-         
-         
             good = {
-                "good_code": item[
-                    "ProductID"
-                ], 
+                "good_code": item["ProductID"],
                 "quantity": item["Quantity"],
                 "sale_price": item["Price"],
                 "tax_category": item["TaxRule"],
@@ -354,9 +347,11 @@ def create_mita_invoice(
         "instance_invoice_id": invoice_code,
     }
     struct_logger.info(event="sending dear invoice to mita", mita_payload=mita_payload)
-    return send_mita_request("invoice/queue?api_extension=_dear", mita_payload, client_data)
+    return send_mita_request(
+        "invoice/queue?api_extension=_dear", mita_payload, client_data
+    )
 
-         
+
 def create_goods_configuration(request, client_acc_id):
     # Get local client
     client_data = get_object_or_404(DearEfrisClientCredentials, pk=client_acc_id)
