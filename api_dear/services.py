@@ -157,10 +157,10 @@ def process_credit_note(response, client_acc_id):
         struct_logger.info(
             event="create_outgoing_dear_credit_note",
             message="Sending invoice to mita",
-            response=tax_invoice,
+            response=tax_invoice.text,
         )
 
-        return tax_invoice
+        return tax_invoice.text
 
     except Exception as ex:
         struct_logger.error(
@@ -298,7 +298,7 @@ def create_mita_invoice(
     return_reason = ""
     return_reason_code = ""
     invoice_code = ""
-    if is_export:
+    if is_export == True:
         industry_code = "102"
 
     if credit_notes:
@@ -306,7 +306,10 @@ def create_mita_invoice(
             original_invoice_code = new_credit_note["CreditNoteInvoiceNumber"]
             invoice_code = new_credit_note["CreditNoteNumber"]
             return_reason = new_credit_note["TaskID"]
-            return_reason_code = "102"
+            return_reason_code = "104"
+            if new_credit_note["Memo"] in ("101", "102", "103", "104", "105"):
+                return_reason_code = new_credit_note["Memo"]
+
     else:
         invoice_code = invoice["InvoiceNumber"]
 
@@ -347,9 +350,7 @@ def create_mita_invoice(
         "instance_invoice_id": invoice_code,
     }
     struct_logger.info(event="sending dear invoice to mita", mita_payload=mita_payload)
-    return send_mita_request(
-        "invoice/queue?api_extension=_dear", mita_payload, client_data
-    )
+    return send_mita_request("invoice/queue?erp=dear", mita_payload, client_data)
 
 
 def create_goods_configuration(request, client_acc_id):

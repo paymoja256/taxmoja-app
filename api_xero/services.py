@@ -251,6 +251,7 @@ def xero_send_invoice_data(request, client_data):
 def generate_mita_invoice(xero_invoices, client_data):
     for xero_invoice in xero_invoices:
         # if xero_invoice['Status'] in ("AUTHORISED"):
+        
         if xero_invoice["Status"] in ("AUTHORISED", "PAID"):
             try:
                 xero_credit_note = xero_invoice["CreditNotes"][0]
@@ -342,28 +343,32 @@ def generate_mita_invoice(xero_invoices, client_data):
                 print(mita_payload)
 
             except Exception as ex:
+                
                 is_export = False
                 is_priviledged = False
                 goods_details = []
                 buyer_type = "0"
 
                 contact_groups = xero_invoice["Contact"]["ContactGroups"]
-
-                if contact_groups[0]["Name"] in ("Business", "business", "Government"):
-                    buyer_type = "0"
-
-                elif contact_groups[0]["Name"] == "Foreignor":
-                    buyer_type = "2"
-
-                else:
-                    buyer_type = "1"
+                
+                
 
                 try:
+                    if contact_groups[0]["Name"] in ("Business", "business", "Government"):
+                        buyer_type = "0"
+
+                    elif contact_groups[0]["Name"] == "Foreignor":
+                        buyer_type = "2"
+
+                    else:
+                        buyer_type = "1"
+
                     buyer_tax_pin = xero_invoice["Contact"]["TaxNumber"]
 
                 except Exception as ex:
                     buyer_type = "1"
                     buyer_tax_pin = ""
+      
 
                 for good in xero_invoice["LineItems"]:
                     mita_good = {
@@ -373,6 +378,8 @@ def generate_mita_invoice(xero_invoices, client_data):
                         "tax_category": good["TaxType"],
                     }
                     goods_details.append(mita_good)
+
+                
 
                 mita_payload = {
                     "invoice_details": {
