@@ -53,8 +53,10 @@ def process_invoice(id, operation, client_data):
         mita_response = create_efris_invoice(item_data, client_data)
     elif operation == "update":
         mita_response = create_efris_invoice(item_data, client_data)
-    elif operation in ("void", "delete"):
+    elif operation in ("void"):
         mita_response = create_efris_invoice(item_data, client_data, credit_note=True)
+    else:
+        return None
 
     struct_logger.info(
         event="quickbooks process invoice",
