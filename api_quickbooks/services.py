@@ -53,6 +53,8 @@ def process_invoice(id, operation, client_data):
         mita_response = create_efris_invoice(item_data, client_data)
     elif operation == "update":
         mita_response = create_efris_invoice(item_data, client_data)
+    elif operation in ("void", "delete"):
+        mita_response = create_efris_invoice(item_data, client_data, credit_note=True)
 
     struct_logger.info(
         event="quickbooks process invoice",
@@ -99,48 +101,43 @@ def create_efris_invoice(
     payment_mode="102",
     invoice_type="1",
     invoice_kind="1",
-    credit_notes="",
+    credit_note=False,
 ):
     original_invoice_code = ""
     return_reason = ""
     return_reason_code = ""
-    invoice_code = ""
+    invoice_code = invoice_data["Id"]
 
-    if credit_notes:
-        pass
-        # for new_credit_note in credit_notes:
-        #     original_invoice_code = new_credit_note["CreditNoteInvoiceNumber"]
-        #     invoice_code = new_credit_note["CreditNoteNumber"]
-        #     return_reason = new_credit_note["TaskID"]
-        #     return_reason_code = "102"
-    else:
-        invoice_code = invoice_data["Id"]
-        cashier = client_data.cashier
-        buyer_details = get_customer_by_id(
-            client_data, invoice_data["CustomerRef"]["value"]
-        )
+    if is_export:
+        industry_code = "102"
 
-        struct_logger.info(event="quick_books_invoice", msg="getting quickbooks buyer details", data=buyer_details)
+    if credit_note:
+        original_invoice_code = invoice_code
+        invoice_code = invoice_code
+        return_reason = "Cancellation of purchase"
+        return_reason_code = "102"
 
-        buyer_details = json.loads(buyer_details)["Customer"]
+    cashier = client_data.cashier
+    buyer_details = get_customer_by_id(
+        client_data, invoice_data["CustomerRef"]["value"]
+    )
 
+    struct_logger.info(
+        event="quick_books_invoice",
+        msg="getting quickbooks buyer details",
+        data=buyer_details,
+    )
 
-        goods_details = clean_goods_details(invoice_data)
+    buyer_details = json.loads(buyer_details)["Customer"]
 
-        currency = invoice_data["CurrencyRef"]["value"]
-        try:
-            description = "{}-{}".format(
-                invoice_data["CustomerMemo"], invoice_data["Id"]
-            )
-        except Exception as ex:
-            description = "{}-{}".format(
-                invoice_data["CustomerRef"], invoice_data["Id"]
-            )
+    goods_details = clean_goods_details(invoice_data)
 
-        if is_export:
-            industry_code = "102"
+    currency = invoice_data["CurrencyRef"]["value"]
+    try:
+        description = "{}-{}".format(invoice_data["CustomerMemo"], invoice_data["Id"])
+    except Exception as ex:
+        description = "{}-{}".format(invoice_data["CustomerRef"], invoice_data["Id"])
 
-    is_privileged = not buyer_details["Taxable"]
 
     buyer_type, buyer_name, tax_pin = clean_buyer_type(buyer_details)
 
@@ -173,7 +170,7 @@ def create_efris_invoice(
             "buyer_citizenship": "",
             "buyer_sector": "",
             "buyer_reference": "",
-            "is_privileged": is_privileged,
+            "is_privileged": False,
             "local_purchase_order": "",
         },
         "instance_invoice_id": invoice_code,
