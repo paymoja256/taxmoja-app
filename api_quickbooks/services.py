@@ -37,10 +37,10 @@ def process_webhook(request, client_data):
         return response
 
 
-#  Helper functions for webhook
+# ############## Helper functions for webhook
 
 
-# Invoicing
+# Invoicing Webhook
 def process_invoice(id, operation, client_data):
     item_data = json.loads(get_invoice_by_id(client_data, id))["Invoice"]
 
@@ -63,23 +63,32 @@ def process_invoice(id, operation, client_data):
     return mita_response.text
 
 
-def get_invoice_by_id(client_data, item_id):
-    route = "invoice/{}".format(item_id)
-
-    response = quickbooks_api_request("GET", client_data, route)
-
-    return response
+# Receipting Webhook
 
 
-def get_customer_by_id(client_data, item_id):
-    route = "customer/{}".format(item_id)
-
-    response = quickbooks_api_request("GET", client_data, route)
-
-    return response
+def process_salesreceipt(id, operation, client_data):
+    pass
 
 
-# Efris Invoice
+# Stock Webhook
+def process_item(id, operation, client_data):
+    item_data = get_item_by_id(client_data, id)
+    product_data = json.loads(item_data)["Item"]
+    if operation == "create":
+        mita_response = create_goods_configuration(product_data, client_data)
+    elif operation == "update":
+        mita_response = create_goods_configuration(product_data, client_data)
+
+    struct_logger.info(
+        event="quickbooks process item",
+        mita_response=mita_response.text,
+        item_data=product_data,
+    )
+
+    return mita_response.text
+
+
+######### MITA Functions  #######
 
 
 def create_efris_invoice(
@@ -111,21 +120,29 @@ def create_efris_invoice(
             client_data, invoice_data["CustomerRef"]["value"]
         )
 
+        struct_logger.info(event="quick_books_invoice", msg="getting quickbooks buyer details", data=buyer_details)
+
         buyer_details = json.loads(buyer_details)["Customer"]
+
 
         goods_details = clean_goods_details(invoice_data)
 
         currency = invoice_data["CurrencyRef"]["value"]
-        description = "{}-{}".format(invoice_data["CustomerMemo"], invoice_data["Id"])
+        try:
+            description = "{}-{}".format(
+                invoice_data["CustomerMemo"], invoice_data["Id"]
+            )
+        except Exception as ex:
+            description = "{}-{}".format(
+                invoice_data["CustomerRef"], invoice_data["Id"]
+            )
 
         if is_export:
             industry_code = "102"
 
     is_privileged = not buyer_details["Taxable"]
 
-    buyer_type, buyer_name = clean_buyer_type(buyer_details)
-
-    tax_pin = ""
+    buyer_type, buyer_name, tax_pin = clean_buyer_type(buyer_details)
 
     mita_payload = {
         "invoice_details": {
@@ -193,30 +210,18 @@ def get_tax_rate(tax_rule):
 
 
 def clean_buyer_type(buyer_details):
+    try:
+        buyer_tin = buyer_details["AlternatePhone"]["FreeFormNumber"]
+        if buyer_tin:
+            return (
+                "0",
+                buyer_details["CompanyName"],
+                buyer_tin,
+            )
 
-    
-    if buyer_details["CompanyName"]:
-        return "1", buyer_details["CompanyName"]
-
-    return "1", buyer_details["DisplayName"]
-
-
-# Stock
-def process_item(id, operation, client_data):
-    item_data = get_item_by_id(client_data, id)
-    product_data = json.loads(item_data)["Item"]
-    if operation == "create":
-        mita_response = create_goods_configuration(product_data, client_data)
-    elif operation == "update":
-        mita_response = create_goods_configuration(product_data, client_data)
-
-    struct_logger.info(
-        event="quickbooks process item",
-        mita_response=mita_response.text,
-        item_data=product_data,
-    )
-
-    return mita_response.text
+        return "1", buyer_details["DisplayName"], ""
+    except:
+        return "1", buyer_details["DisplayName"], ""
 
 
 def create_bulk_stock_configuration(client_data):
@@ -244,35 +249,6 @@ def create_bulk_stock_configuration(client_data):
         )
 
 
-def get_item_by_id(client_data, item_id):
-    route = "item/{}".format(item_id)
-
-    response = quickbooks_api_request("GET", client_data, route)
-
-    struct_logger.info(
-        event="quickbooks get_item_by_id",
-        qb_response=response,
-        item_data=item_id,
-    )
-
-    return response
-
-
-def get_all_items(client_data):
-    route = "query?query=select * from Item"
-    response = quickbooks_api_request("GET", client_data, route)
-
-    struct_logger.info(
-        event="quickbooks get_all_items",
-        qb_response=response,
-    )
-
-    return response
-
-
-#  EFRIS Stock
-
-
 def create_goods_configuration(product_data, client_data):
     # Get local client
 
@@ -288,10 +264,9 @@ def create_goods_configuration(product_data, client_data):
             unit_price = product_data["UnitPrice"]
             description = product_data["Description"]
         except Exception as ex:
-
             goods_name = product_data["Name"]
             goods_code = product_data["Id"]
-            unit_price = '1.0'
+            unit_price = "1.0"
             description = product_data["FullyQualifiedName"]
 
         measure_unit = client_data.stock_configuration_measure_unit
@@ -328,6 +303,59 @@ def create_goods_configuration(product_data, client_data):
             "message": "Could not configure product: {}".format(product_data),
             "error": ex,
         }
+
+
+# #### Quickbooks Functions ###########
+
+
+def get_invoice_by_id(client_data, item_id):
+    route = "invoice/{}".format(item_id)
+
+    response = quickbooks_api_request("GET", client_data, route)
+
+    return response
+
+
+def get_receipt_by_id(client_data, item_id):
+    route = "receipt/{}".format(item_id)
+
+    response = quickbooks_api_request("GET", client_data, route)
+
+    return response
+
+
+def get_customer_by_id(client_data, item_id):
+    route = "customer/{}".format(item_id)
+
+    response = quickbooks_api_request("GET", client_data, route)
+
+    return response
+
+
+def get_item_by_id(client_data, item_id):
+    route = "item/{}".format(item_id)
+
+    response = quickbooks_api_request("GET", client_data, route)
+
+    struct_logger.info(
+        event="quickbooks get_item_by_id",
+        qb_response=response,
+        item_data=item_id,
+    )
+
+    return response
+
+
+def get_all_items(client_data):
+    route = "query?query=select * from Item"
+    response = quickbooks_api_request("GET", client_data, route)
+
+    struct_logger.info(
+        event="quickbooks get_all_items",
+        qb_response=response,
+    )
+
+    return response
 
 
 # Company test
