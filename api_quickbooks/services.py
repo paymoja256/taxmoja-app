@@ -260,7 +260,7 @@ def create_goods_configuration(product_data, client_data):
         try:
             goods_name = product_data["Name"]
             goods_code = product_data["Id"]
-            unit_price = product_data["UnitPrice"]
+            unit_price = str(product_data["UnitPrice"])
             description = product_data["Description"]
         except Exception as ex:
             goods_name = product_data["Name"]
